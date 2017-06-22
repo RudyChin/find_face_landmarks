@@ -3,23 +3,28 @@ project(find_face_landmarks)
 
 # Set version
 set(FFL_MAJOR_VERSION 1)
-set(FFL_MINOR_VERSION 1)
+set(FFL_MINOR_VERSION 2)
 set(FIND_FACE_LANDMARKS_VERSION ${FFL_MAJOR_VERSION}.${FFL_MINOR_VERSION})
 
 # Global configurations
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-if(UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC")
+if(WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX -DNO_STRICT")
+	set(DEF_INSTALL_CMAKE_DIR cmake)
 else()
-	 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	set(DEF_INSTALL_CMAKE_DIR lib/cmake/${PROJECT_NAME})
 endif()
-
+set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH
+	"Installation directory for CMake files")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING
+	"Add a custom \"postfix\" to static and shared libraries when in Debug build")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Optional 3rd party components
 # ===================================================
 option(WITH_BOOST_STATIC "Boost static libraries" OFF)
-option(WITH_VSAL "Video Stream Abstraction Layer" ON)
 option(WITH_PROTOBUF "Protocol Buffers - Google's data interchange format" ON)
 option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
 option(WITH_QT "Qt" ON)
@@ -45,12 +50,6 @@ if(WITH_OPENCV_CONTRIB)
 endif()
 
 # Boost
-#if(WIN32)
-#	set(Boost_USE_STATIC_LIBS ON)	# only find static libs
-#endif(WIN32)
-#set(Boost_USE_MULTITHREADED ON)
-#set(Boost_USE_STATIC_LIBS ${WITH_BOOST_STATIC})
-#set(BOOST_ALL_DYN_LINK NOT ${WITH_BOOST_STATIC})
 if(WIN32)
 	if(${WITH_BOOST_STATIC})
 		add_definitions(-DBOOST_ALL_NO_LIB)
@@ -59,11 +58,6 @@ if(WIN32)
 	endif()
 endif()
 find_package(Boost REQUIRED filesystem program_options)
-
-# vsal
-if(WITH_VSAL)
-	find_package(vsal)
-endif()
 
 # protobuf
 if(WITH_PROTOBUF)
@@ -85,10 +79,6 @@ if(BUILD_DOCS)
 endif()
 
 # Interfaces
-if(NOT WITH_VSAL)
-	message(STATUS "Matlab interface won't be build because it depends on vsal.")
-	set(BUILD_INTERFACE_MATLAB OFF CACHE BOOL "Build interface for Matlab" FORCE)
-endif()
 if(BUILD_INTERFACE_MATLAB)
 	find_package(Matlab COMPONENTS MX_LIBRARY)
 	if(NOT Matlab_FOUND)
