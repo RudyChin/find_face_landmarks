@@ -18,7 +18,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Optional 3rd party components
 # ===================================================
-option(WITH_BOOST_STATIC "Boost static libraries" ON)
+option(WITH_BOOST_STATIC "Boost static libraries" OFF)
 option(WITH_VSAL "Video Stream Abstraction Layer" ON)
 option(WITH_PROTOBUF "Protocol Buffers - Google's data interchange format" ON)
 option(WITH_OPENCV_CONTRIB "OpenCV's extra modules" ON)
@@ -49,8 +49,8 @@ endif()
 #	set(Boost_USE_STATIC_LIBS ON)	# only find static libs
 #endif(WIN32)
 #set(Boost_USE_MULTITHREADED ON)
-set(Boost_USE_STATIC_LIBS ${WITH_BOOST_STATIC})
-set(BOOST_ALL_DYN_LINK NOT ${WITH_BOOST_STATIC})
+#set(Boost_USE_STATIC_LIBS ${WITH_BOOST_STATIC})
+#set(BOOST_ALL_DYN_LINK NOT ${WITH_BOOST_STATIC})
 if(WIN32)
 	if(${WITH_BOOST_STATIC})
 		add_definitions(-DBOOST_ALL_NO_LIB)
